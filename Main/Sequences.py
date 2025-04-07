@@ -11,20 +11,11 @@ class SequenceUser:
 class DNASequenceUser(SequenceUser):
     pass
 
-
 class RNASequenceUser:
-    def __init__(self,sequence):
-        self.sequence = sequence
-
-    def __str__(self):
-        return f"{self.sequence}"
+    pass
 
 class ProteinSequenceUser:
-    def __init__(self,sequence):
-        self.sequence = sequence
-
-    def __str__(self):
-     return f"{self.sequence}"
+    pass
 
 class ProteinSequence:
     """
