@@ -1,68 +1,156 @@
 import tkinter
 from tkinter import*
-from tkinter.ttk import Label
 from tkinter.ttk import *
+from Converters import *
+from Alghorithm import *
+from Sequences import *
+from pandastable import Table, TableModel
+
 
 class App(tkinter.Tk):
     """
     Main application class for creating and managing the tkinter GUI.
     """
     def __init__(self):
-
-        """
-        Function initializes the application window, layout and tabs.
-        """
         super().__init__()
         self.geometry("400x400")
         icon = tkinter.PhotoImage(file="dna.png")
         self.iconphoto(True, icon)
         self.title("Needleman-Wunsch Algorithm")
-        self.grid_columnconfigure((0, 1), weight=1)
+        self.container = tkinter.Frame(self)
+        self.container.pack(fill="both", expand=True)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
 
-        self.tabControl = tkinter.ttk.Notebook(self)
-        self.tabControl.pack(expand=True, fill="both")
+        self.table_container = tkinter.Frame(self)
+        self.table_container.pack(fill="both", expand=True)
 
-        self.choice_frame = MyFrame(self,tabControl=self.tabControl)
-        self.choice_frame.pack(fill=BOTH, expand=True, padx=10, pady=10)
-        self.tabControl.add(self.choice_frame, text="Main Frame")
+        self.frames = {}
+        for F in (HomePage, DNAInputPage, RNAInputPage,ProteinInputPage,FastaInputPage):
+            frame = F(self.container, self)
+            self.frames[F] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
 
-class MyFrame(tkinter.Frame):
-    def __init__(self, parent, tabControl):
+        self.show_frame(HomePage)
+
+    def show_frame(self, page_class):
+        frame = self.frames[page_class]
+        frame.tkraise()
+
+class HomePage(tkinter.Frame):
+    def __init__(self, parent, controller):
         super().__init__(parent)
         self.parent = parent
-        self.generatedTabs = 0
-        self.tabControl = tabControl
 
         self.configure(bg="#ad86e3")
 
-        self.button_dna =tkinter.Button(self, text="Enter two DNA sequence", command=self.go_to_DNA_input,  fg="black", bg ="#5ba679")
+        self.button_dna =tkinter.Button(self, text="Enter two DNA _sequence", command=lambda:controller.show_frame(DNAInputPage),  fg="black", bg ="#5ba679")
         self.button_dna.pack(padx=10, pady=10)
 
-        self.button_rna = tkinter.Button(self, text="Enter two RNA sequence", command=self.go_to_DNA_input,
+        self.button_rna = tkinter.Button(self, text="Enter two RNA _sequence", command=lambda:controller.show_frame(RNAInputPage),
                          fg="black", bg="#5ba679")
         self.button_rna.pack(padx=10, pady=10)
 
-        self.button_protein =tkinter.Button(self, text="Enter two protein sequence", command=self.go_to_DNA_input,
+        self.button_protein =tkinter.Button(self, text="Enter two protein _sequence", command=lambda:controller.show_frame(ProteinInputPage),
                            fg="black", bg="#5ba679")
         self.button_protein.pack(padx=10, pady=10)
 
-        self.button_fasta =tkinter.Button(self, text="Enter fasta files", command=self.go_to_DNA_input,
+        self.button_fasta =tkinter.Button(self, text="Enter fasta files", command=lambda:controller.show_frame(FastaInputPage),
                                fg="black", bg="#5ba679")
         self.button_fasta.pack(padx=10, pady=10)
 
-    def go_to_DNA_input(self):
-        self.generatedTabs += 1
-        user_input_frame = tkinter.Frame(self.tabControl)
-        label1=tkinter.Label(user_input_frame, text="Enter first DNA sequence")
-        label1.pack()
-        first_seq = tkinter.Entry(user_input_frame)
-        first_seq.pack(pady=10, padx=10)
-        label2 = tkinter.Label(user_input_frame, text="Enter second DNA sequence")
-        label2.pack()
-        second_seq=tkinter.Entry(user_input_frame)
-        second_seq.pack(padx=10, pady=10)
-        user_input_frame.pack(expand=True, fill="both")
-        self.tabControl.add(user_input_frame, text=f"Data input{self.generatedTabs}")
+class DNAInputPage(tkinter.Frame):
+    def __init__(self, parent, controller):
+        tkinter.Frame.__init__(self, parent)
+        self.parent = parent
+        self.configure(bg="#ad86e3")
+
+        self.label1=tkinter.Label(self, text="Enter first DNA _sequence")
+        self.label1.pack(padx=10, pady=10)
+        self.enter_dna1 = tkinter.Entry(self, bg="#ad86e3")
+        self.enter_dna1.pack(padx=10, pady=10)
+
+        self.label2=tkinter.Label(self, text="Enter second DNA _sequence")
+        self.label2.pack(padx=10, pady=10)
+        self.enter_dna2 = tkinter.Entry(self, bg="#ad86e3")
+        self.enter_dna2.pack(padx=10, pady=10)
+
+        self.button_back = tkinter.Button(self, text="Generate", command=self.getData, fg="black", bg ="#5ba679")
+        self.button_back.pack(padx=10, pady=10)
+
+        self.button_back = tkinter.Button(self, text="Back", command=lambda:controller.show_frame(HomePage), fg="black", bg ="#5ba679")
+        self.button_back.pack(padx=10, pady=10)
+
+
+    def getData(self):
+        input_se1=str(self.enter_dna1.get())
+        input_seq2=str(self.enter_dna2.get())
+        seq1=convert_user_input_DNA(input_se1)
+        seq2=convert_user_input_DNA(input_seq2)
+        df = algorithm_implementation(seq1, seq2, gap=-1, mismatch=0, match=1)
+        # print(df)
+        # print(traceback(df, gap=-1, mismatch=0, match=1))
+        # print(int(get_score(df)))
+        #table osobna klasa
+        #layout landy
+        #kolory
+        df.insert(0,column="",value=[x for x in "-" + seq1.seq()])
+        self.table =Table(self.parent.master.table_container, dataframe=df,
+                                showtoolbar=True, showstatusbar=True)
+        self.table.show()
+
+
+class RNAInputPage(tkinter.Frame):
+    def __init__(self, parent, controller):
+        tkinter.Frame.__init__(self, parent)
+        self.parent = parent
+        self.configure(bg="#ad86e3")
+
+        self.label1=tkinter.Label(self, text="Enter first RNA _sequence")
+        self.label1.pack(padx=10, pady=10)
+        self.enter_rna1 = tkinter.Entry(self, bg="#ad86e3")
+        self.enter_rna1.pack(padx=10, pady=10)
+
+        self.label2=tkinter.Label(self, text="Enter second RNA _sequence")
+        self.label2.pack(padx=10, pady=10)
+        self.enter_rna2 = tkinter.Entry(self, bg="#ad86e3")
+        self.enter_rna2.pack(padx=10, pady=10)
+
+        self.button_back = tkinter.Button(self, text="Back", command=lambda:controller.show_frame(HomePage), fg="black", bg ="#5ba679")
+        self.button_back.pack(padx=10, pady=10)
+
+class ProteinInputPage(tkinter.Frame):
+    def __init__(self, parent, controller):
+        tkinter.Frame.__init__(self, parent)
+        self.parent = parent
+        self.configure(bg="#ad86e3")
+
+        self.label1=tkinter.Label(self, text="Enter first protein _sequence")
+        self.label1.pack(padx=10, pady=10)
+        self.enter_protein1 = tkinter.Entry(self, bg="#ad86e3")
+        self.enter_protein1.pack(padx=10, pady=10)
+
+        self.label2=tkinter.Label(self, text="Enter second protein _sequence")
+        self.label2.pack(padx=10, pady=10)
+        self.enter_protein2 = tkinter.Entry(self, bg="#ad86e3")
+        self.enter_protein2.pack(padx=10, pady=10)
+        self.button_back = tkinter.Button(self, text="Back", command=lambda:controller.show_frame(HomePage), fg="black", bg ="#5ba679")
+        self.button_back.pack(padx=10, pady=10)
+
+class FastaInputPage(tkinter.Frame):
+    def __init__(self, parent, controller):
+        tkinter.Frame.__init__(self, parent)
+        self.parent = parent
+        self.configure(bg="#ad86e3")
+
+        self.label1=tkinter.Label(self, text="Enter first fasta file")
+        self.label1.pack(padx=10, pady=10)
+
+        self.label2=tkinter.Label(self, text="Enter second fasta file")
+        self.label2.pack(padx=10, pady=10)
+
+        self.button_back = tkinter.Button(self, text="Back", command=lambda:controller.show_frame(HomePage), fg="black", bg ="#5ba679")
+        self.button_back.pack(padx=10, pady=10)
 
 if __name__ == '__main__':
     app=App()

@@ -1,9 +1,16 @@
-class DNASequenceUser:
-    def __init__(self,sequence):
-        self.sequence = sequence
+class SequenceUser:
+    def __init__(self,sequence : str):
+        self._sequence : str = sequence.upper()
 
     def __str__(self):
-        return f"{self.sequence}"
+        return f"{self._sequence}"
+
+    def seq(self):
+        return self._sequence
+
+class DNASequenceUser(SequenceUser):
+    pass
+
 
 class RNASequenceUser:
     def __init__(self,sequence):
@@ -21,35 +28,35 @@ class ProteinSequenceUser:
 
 class ProteinSequence:
     """
-        Represents a protein sequence with an identifier and sequence data.
+        Represents a protein _sequence with an identifier and _sequence data.
 
           Attributes:
           identifier (str): the FASTA identifier for the protein.
-          data (str) :The sequence data of the protein.
+          data (str) :The _sequence data of the protein.
 
           Methods
           __init__():
-          Initializes a ProteinSequence object with an identifier and sequence data.
+          Initializes a ProteinSequence object with an identifier and _sequence data.
           __str__():
-              Returns the protein sequence in FASTA format.
+              Returns the protein _sequence in FASTA format.
     """
     def __init__(self, identifier: str, data: str):
         """
-            Initializes a ProteinSequence object with an identifier and sequence data.
+            Initializes a ProteinSequence object with an identifier and _sequence data.
 
             Param:
             identifier (str) : The FASTA identifier for the protein.
-            data (str) : The sequence data of the protein.
+            data (str) : The _sequence data of the protein.
         """
         self.identifier = identifier
         self.data = data
 
     def __str__(self):
         """
-            Returns the protein sequence in FASTA format.
+            Returns the protein _sequence in FASTA format.
 
             Returns:
-                str :The protein sequence formatted as:
+                str :The protein _sequence formatted as:
                         >identifier
                         data
         """
@@ -63,7 +70,7 @@ def fasta_to_pro_seq(fasta_file):
        fasta_file: Path to the FASTA file.
 
        Return:
-       ProteinSequence object or None: A ProteinSequence object if the file is valid,containing the identifier and sequence, None otherwise.
+       ProteinSequence object or None: A ProteinSequence object if the file is valid,containing the identifier and _sequence, None otherwise.
        """
     try:
         with open(fasta_file, "r") as file:
@@ -72,7 +79,7 @@ def fasta_to_pro_seq(fasta_file):
             if identifier and content:
                 return ProteinSequence(identifier, content)
             else:
-                print("missing identifier or sequence.")
+                print("missing identifier or _sequence.")
                 return None
     except FileNotFoundError:
         print("File Not Found")

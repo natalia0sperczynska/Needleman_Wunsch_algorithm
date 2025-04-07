@@ -1,12 +1,15 @@
 import numpy as np
 import pandas as pd
-seq1="GGAATTCCA"
-seq2="GAAGTCCCA"
 
-def algorithm_implementation(seq1, seq2, match=1, gap = -1, mismatch=0):
+from Sequences import *
+#
+# seq1="GGAATTCCA"
+# seq2="GAAGTCCCA"
+
+def algorithm_implementation(seq1 : SequenceUser, seq2 :SequenceUser, match=1, gap = -1, mismatch=0):
     score = 0
-    seq1 = "-" + seq1
-    seq2 = "-" + seq2
+    seq1 = "-" + seq1.seq()
+    seq2 = "-" + seq2.seq()
     row_seq=[label for label in seq1]
     col_seq =[label for label in seq2]
     df = pd.DataFrame(np.zeros((len(seq1), len(seq2))), index=row_seq, columns=col_seq)
@@ -38,7 +41,7 @@ def tracebackr(i, j, align1, align2, df : pd.DataFrame,  accumulator : list, mat
         tracebackr(i-1,j-1, df.columns[j]+align1, df.index[i]+align2, df, accumulator, match, gap, mismatch)
 
 def get_score(df:pd.DataFrame)->int:
-    return df.iloc[len(seq1),len(seq2)]
+    return df.iloc[-1,-1]
 
 if __name__ == '__main__':
     df = algorithm_implementation(seq1,seq2,gap=-1, mismatch=0,match=1)
