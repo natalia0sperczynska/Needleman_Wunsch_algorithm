@@ -1,16 +1,23 @@
-class ProteinSequenceUser:
-    def __init__(self,sequence):
-        self.sequence = sequence
-
-    def __str__(self):
-     return f"{self.sequence}"
-
 class DNASequenceUser:
     def __init__(self,sequence):
         self.sequence = sequence
 
     def __str__(self):
         return f"{self.sequence}"
+
+class RNASequenceUser:
+    def __init__(self,sequence):
+        self.sequence = sequence
+
+    def __str__(self):
+        return f"{self.sequence}"
+
+class ProteinSequenceUser:
+    def __init__(self,sequence):
+        self.sequence = sequence
+
+    def __str__(self):
+     return f"{self.sequence}"
 
 class ProteinSequence:
     """
