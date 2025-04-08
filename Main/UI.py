@@ -60,21 +60,22 @@ class HomePage(tkinter.Frame):
                                fg="black", bg="#5ba679")
         self.button_fasta.pack(padx=10, pady=10)
 
-class DNAInputPage(tkinter.Frame):
-    def __init__(self, parent, controller):
-        tkinter.Frame.__init__(self, parent)
+class InputBaseFrame(tkinter.Frame):
+    def __init__(self, parent, controller,convert_fun):
+        super().__init__(parent)
         self.parent = parent
+        self.controller = controller
+        self.convert_fun = convert_fun
         self.configure(bg="#ad86e3")
-
-        self.label1=tkinter.Label(self, text="Enter first DNA sequence")
+        self.label1 = tkinter.Label(self, text="Enter first sequence")
         self.label1.pack(padx=10, pady=10)
-        self.enter_dna1 = tkinter.Entry(self, bg="#ad86e3")
-        self.enter_dna1.pack(padx=10, pady=10)
+        self.enter1 = tkinter.Entry(self, bg="#ad86e3")
+        self.enter1.pack(padx=10, pady=10)
 
-        self.label2=tkinter.Label(self, text="Enter second DNA sequence")
+        self.label2=tkinter.Label(self, text="Enter second sequence")
         self.label2.pack(padx=10, pady=10)
-        self.enter_dna2 = tkinter.Entry(self, bg="#ad86e3")
-        self.enter_dna2.pack(padx=10, pady=10)
+        self.enter2 = tkinter.Entry(self, bg="#ad86e3")
+        self.enter2.pack(padx=10, pady=10)
 
         self.button_back = tkinter.Button(self, text="Generate", command=self.get_data, fg="black", bg ="#5ba679")
         self.button_back.pack(padx=10, pady=10)
@@ -84,19 +85,22 @@ class DNAInputPage(tkinter.Frame):
 
 
     def get_data(self):
-        input_se1 = str(self.enter_dna1.get())
-        input_seq2 = str(self.enter_dna2.get())
+        input_seq1 = str(self.enter1.get())
+        input_seq2 = str(self.enter2.get())
+        seq1_labels="-"+input_seq1.upper()
         try:
-            seq1 = convert_user_input_DNA(input_se1)
-            seq2 = convert_user_input_DNA(input_seq2)
+            seq1 = self.convert_fun(input_seq1)
+            seq2 = self.convert_fun(input_seq2)
             df = algorithm_implementation(seq1, seq2, gap=-1, mismatch=0, match=1)
-            # print(df)
-            # print(traceback(df, gap=-1, mismatch=0, match=1))
-            # print(int(get_score(df)))
+            print("DF rows:", df.shape[0])
+            print("Sequence length:", len(seq1.seq()) + 1)
+            print(df)
+            print(traceback(df, gap=-1, mismatch=0, match=1))
+            print(int(get_score(df)))
             #table osobna klasa
             #layout landy
             #kolory
-            df.insert(0,column="",value=[x for x in "-" + seq1.seq()])
+            df.insert(0,column="",value=[x for x in seq1_labels])
             self.table =Table(self.parent.master.table_container, dataframe=df,
                                     showtoolbar=True, showstatusbar=True)
             self.table.show()
@@ -105,96 +109,21 @@ class DNAInputPage(tkinter.Frame):
                 return
 
 
-class RNAInputPage(tkinter.Frame):
-    def __init__(self, parent, controller):
-        tkinter.Frame.__init__(self, parent)
-        self.parent = parent
-        self.configure(bg="#ad86e3")
+class DNAInputPage(InputBaseFrame):
+    def __init__(self, parent, controller, convert_fun=convert_user_input_DNA):
+        super().__init__(parent, controller,convert_fun)
 
-        self.label1=tkinter.Label(self, text="Enter first RNA sequence")
-        self.label1.pack(padx=10, pady=10)
-        self.enter_rna1 = tkinter.Entry(self, bg="#ad86e3")
-        self.enter_rna1.pack(padx=10, pady=10)
+class RNAInputPage(InputBaseFrame):
+    def __init__(self, parent, controller, convert_fun=convert_user_input_RNA):
+        super().__init__(parent, controller, convert_fun)
 
-        self.label2=tkinter.Label(self, text="Enter second RNA sequence")
-        self.label2.pack(padx=10, pady=10)
-        self.enter_rna2 = tkinter.Entry(self, bg="#ad86e3")
-        self.enter_rna2.pack(padx=10, pady=10)
+class ProteinInputPage(InputBaseFrame):
+    def __init__(self, parent, controller,convert_fun=convert_user_input_Protein):
+        super().__init__(parent, controller, convert_fun)
 
-        self.button_back = tkinter.Button(self, text="Generate", command=self.get_data, fg="black", bg="#5ba679")
-        self.button_back.pack(padx=10, pady=10)
-
-        self.button_back = tkinter.Button(self, text="Back", command=lambda:controller.show_frame(HomePage), fg="black", bg ="#5ba679")
-        self.button_back.pack(padx=10, pady=10)
-
-    def get_data(self):
-        input_se1=str(self.enter_rna1.get())
-        input_seq2=str(self.enter_rna2.get())
-        seq1=convert_user_input_DNA(input_se1)
-        seq2=convert_user_input_DNA(input_seq2)
-
-        try:
-            df = algorithm_implementation(seq1, seq2, gap=-1, mismatch=0, match=1)
-            df.insert(0,column="",value=[x for x in "-" + seq1.seq()])
-            self.table =Table(self.parent.master.table_container, dataframe=df,
-                                    showtoolbar=True, showstatusbar=True)
-            self.table.show()
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-            return
-
-class ProteinInputPage(tkinter.Frame):
-    def __init__(self, parent, controller):
-        tkinter.Frame.__init__(self, parent)
-        self.parent = parent
-        self.configure(bg="#ad86e3")
-
-        self.label1=tkinter.Label(self, text="Enter first protein sequence")
-        self.label1.pack(padx=10, pady=10)
-        self.enter_protein1 = tkinter.Entry(self, bg="#ad86e3")
-        self.enter_protein1.pack(padx=10, pady=10)
-
-        self.label2=tkinter.Label(self, text="Enter second protein sequence")
-        self.label2.pack(padx=10, pady=10)
-        self.enter_protein2 = tkinter.Entry(self, bg="#ad86e3")
-        self.enter_protein2.pack(padx=10, pady=10)
-
-        self.button_back = tkinter.Button(self, text="Generate", command=self.get_data, fg="black", bg="#5ba679")
-        self.button_back.pack(padx=10, pady=10)
-
-        self.button_back = tkinter.Button(self, text="Back", command=lambda:controller.show_frame(HomePage), fg="black", bg ="#5ba679")
-        self.button_back.pack(padx=10, pady=10)
-
-    def get_data(self):
-        input_se1=str(self.enter_protein1.get())
-        input_seq2=str(self.enter_protein2.get())
-        seq1=convert_user_input_DNA(input_se1)
-        seq2=convert_user_input_DNA(input_seq2)
-        try:
-            df = algorithm_implementation(seq1, seq2, gap=-1, mismatch=0, match=1)
-            df.insert(0,column="",value=[x for x in "-" + seq1.seq()])
-            self.table =Table(self.parent.master.table_container, dataframe=df,
-                                    showtoolbar=True, showstatusbar=True)
-            self.table.show()
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-            return
-
-class FastaInputPage(tkinter.Frame):
-    def __init__(self, parent, controller):
-        tkinter.Frame.__init__(self, parent)
-        self.parent = parent
-        self.configure(bg="#ad86e3")
-
-        self.label1=tkinter.Label(self, text="Enter first fasta file")
-        self.label1.pack(padx=10, pady=10)
-
-        self.label2=tkinter.Label(self, text="Enter second fasta file")
-        self.label2.pack(padx=10, pady=10)
-
-        self.button_back = tkinter.Button(self, text="Back", command=lambda:controller.show_frame(HomePage), fg="black", bg ="#5ba679")
-        self.button_back.pack(padx=10, pady=10)
-
+class FastaInputPage(InputBaseFrame):
+    def __init__(self, parent, controller,convert_fun=convert_user_input_Protein):
+        super().__init__(parent, controller, convert_fun)
 if __name__ == '__main__':
     app=App()
     app.mainloop()

@@ -13,9 +13,12 @@ def algorithm_implementation(seq1 : SequenceUser, seq2 :SequenceUser, match=1, g
     row_seq=[label for label in seq1]
     col_seq =[label for label in seq2]
     df = pd.DataFrame(np.zeros((len(seq1), len(seq2))), index=row_seq, columns=col_seq)
-
-    df.iloc[0,:] = np.linspace(0, gap*(len(seq1)-1), len(seq1))
-    df.iloc[:,0] = np.linspace(0, gap*(len(seq2)-1), len(seq2))
+    # df.iloc[0, :] = np.linspace(0, gap * (len(seq1) - 1), len(seq1))
+    # df.iloc[:, 0] = np.linspace(0, gap * (len(seq2) - 1), len(seq2))
+    for i in range(len(seq2)):
+        df.iloc[0, i] = i * gap
+    for j in range(len(seq1)):
+        df.iloc[j, 0] = j * gap
 
     for i in range(1,len(seq1)):
         for j in range(1, len(seq2)):
@@ -44,7 +47,8 @@ def get_score(df:pd.DataFrame)->int:
     return df.iloc[-1,-1]
 
 if __name__ == '__main__':
-    df = algorithm_implementation(seq1,seq2,gap=-1, mismatch=0,match=1)
-    print(df)
-    print(traceback(df, gap=-1, mismatch=0, match=1))
-    print(int(get_score(df)))
+    pass
+    # df = algorithm_implementation(seq1,seq2,gap=-1, mismatch=0,match=1)
+    # print(df)
+    # print(traceback(df, gap=-1, mismatch=0, match=1))
+    # print(int(get_score(df)))
