@@ -11,13 +11,13 @@ class SequenceUser:
 class DNASequenceUser(SequenceUser):
     pass
 
-class RNASequenceUser:
+class RNASequenceUser(SequenceUser):
     pass
 
-class ProteinSequenceUser:
+class ProteinSequenceUser(SequenceUser):
     pass
 
-class ProteinSequence:
+class ProteinSequence(SequenceUser):
     """
         Represents a protein _sequence with an identifier and _sequence data.
 

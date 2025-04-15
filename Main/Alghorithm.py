@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
+from pandas.core.interchange.dataframe_protocol import DataFrame
 
 from Sequences import *
 #
 # seq1="GGAATTCCA"
 # seq2="GAAGTCCCA"
 
-def algorithm_implementation(seq1 : SequenceUser, seq2 :SequenceUser, match=1, gap = -1, mismatch=0):
+def algorithm_implementation(seq1 : SequenceUser, seq2 :SequenceUser, match=1, gap = -1, mismatch=0)->DataFrame:
     score = 0
     seq1 = "-" + seq1.seq()
     seq2 = "-" + seq2.seq()
