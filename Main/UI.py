@@ -4,13 +4,9 @@ from tkinter import messagebox
 from tkinter import filedialog
 from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from pandas.core.interchange.dataframe_protocol import DataFrame
-
 from Converters import *
 from Alghorithm import *
 from Plot import generate_graph
-from Sequences import *
-
 import pandas as pd
 from pandas import *
 
@@ -26,7 +22,6 @@ class App(tkinter.Tk):
     """
     def __init__(self):
         super().__init__()
-        self.geometry("400x400")
         icon = tkinter.PhotoImage(file="dna.png")
         self.iconphoto(True, icon)
         self.title("Needleman-Wunsch Algorithm")
@@ -46,9 +41,14 @@ class App(tkinter.Tk):
 
         self.show_frame(HomePage)
 
+        self.update_idletasks()
+        self.minsize(400,400)
+
     def show_frame(self, page_class):
         frame = self.frames[page_class]
         frame.tkraise()
+        self.update_idletasks()
+        self.minsize(400,400)
 
 class HomePage(tkinter.Frame):
     def __init__(self, parent, controller):
@@ -89,25 +89,67 @@ class InputBaseFrame(tkinter.Frame):
         self.enter1 = tkinter.Entry(self, bg="#ad86e3")
         self.enter1.pack(padx=10, pady=10)
         self.enter1.bind('<FocusOut>',self.update_entry1)
-        self.button1 = tkinter.Button(self, text="Add file", command=lambda: self.open_file1(self.file1))
-        self.button1.pack(padx=10, pady=10)
 
         self.label2=tkinter.Label(self, text="Enter second sequence")
         self.label2.pack(padx=10, pady=10)
         self.enter2 = tkinter.Entry(self, bg="#ad86e3")
         self.enter2.pack(padx=10, pady=10)
         self.enter2.bind('<FocusOut>', self.update_entry2)
-        self.button2 = tkinter.Button(self, text="Add file", command=lambda: self.open_file2(self.file2))
-        self.button2.pack(padx=10, pady=10)
 
-        self.button_back = tkinter.Button(self, text="Generate", command=self.get_data, fg="black", bg ="#5ba679")
+        # self.button_save = tkinter.Button(self, text="Save", fg="black", bg="#5ba679")
+        # self.button_save.pack(padx=10, pady=10)
+
+        self.button_back = tkinter.Button(self, text="Generate", command=lambda:get_data(self.seq1_str,self.seq2_str,self.convert_fun, self.parent,self), fg="black", bg ="#5ba679")
         self.button_back.pack(padx=10, pady=10)
 
         self.button_graph = tkinter.Button(self, text="Show graph",
-                                           command= self.show_graph_window, fg="black", bg="#5ba679")
+                                           command=lambda:show_graph_window(self.df,self.parent), fg="black", bg="#5ba679")
         self.button_graph.pack(padx=10, pady=10)
 
         self.button_back = tkinter.Button(self, text="Back", command=lambda:controller.show_frame(HomePage), fg="black", bg ="#5ba679")
+        self.button_back.pack(padx=10, pady=10)
+
+    def update_entry1(self, event):
+        self.seq1_str = str(self.enter1.get())
+        print(self.seq1_str)
+
+    def update_entry2(self, event):
+        self.seq2_str = str(self.enter2.get())
+        print(self.seq2_str)
+
+
+class FastaInputPage(tkinter.Frame):
+    def __init__(self, parent, controller, convert_fun=convert_user_input_Protein):
+        super().__init__(parent)
+        self.df: pd.DataFrame = None
+        self.parent = parent
+        self.controller = controller
+        self.convert_fun = convert_fun
+        self.file1 = None
+        self.file2 = None
+        self.seq1_str = ""
+        self.seq2_str = ""
+        self.configure(bg="#ad86e3")
+        self.label1 = tkinter.Label(self, text="Enter first sequence")
+        self.label1.pack(padx=10, pady=10)
+
+        self.button1 = tkinter.Button(self, text="Add file", command=lambda: self.open_file1(self.file1))
+        self.button1.pack(padx=10, pady=10)
+
+        self.label2 = tkinter.Label(self, text="Enter second sequence")
+        self.label2.pack(padx=10, pady=10)
+        self.button2 = tkinter.Button(self, text="Add file", command=lambda: self.open_file2(self.file2))
+        self.button2.pack(padx=10, pady=10)
+
+        self.button_generate = tkinter.Button(self, text="Generate", command=lambda:get_data(self.seq1_str, self.seq2_str, self.convert_fun, self.parent, self), fg="black", bg="#5ba679")
+        self.button_generate.pack(padx=10, pady=10)
+
+        self.button_graph = tkinter.Button(self, text="Show graph",
+                                           command=lambda:show_graph_window(self.df,self.parent), fg="black", bg="#5ba679")
+        self.button_graph.pack(padx=10, pady=10)
+
+        self.button_back = tkinter.Button(self, text="Back", command=lambda: controller.show_frame(HomePage),
+                                              fg="black", bg="#5ba679")
         self.button_back.pack(padx=10, pady=10)
 
     def open_file1(self,file):
@@ -128,63 +170,6 @@ class InputBaseFrame(tkinter.Frame):
         self.seq2_str = content
         file.close()
 
-    def update_entry1(self, event):
-        self.seq1_str = str(self.enter1.get())
-        print(self.seq1_str)
-
-    def update_entry2(self, event):
-        self.seq2_str = str(self.enter2.get())
-        print(self.seq2_str)
-
-    def get_data(self):
-        input_seq1 = self.seq1_str
-        input_seq2 = self.seq2_str
-        seq1_labels="-"+input_seq1.upper()
-        try:
-            seq1 = self.convert_fun(input_seq1)
-            seq2 = self.convert_fun(input_seq2)
-            df = algorithm_implementation(seq1, seq2, gap=-1, mismatch=0, match=1)
-            self.df=df
-            print(df)
-            print(traceback(df, gap=-1, mismatch=0, match=1))
-            print(int(get_score(df)))
-            #layout landy
-            #zapis do pliku tekstowego i zapis wykresu
-            #zrobic kopie do tableki
-            df_copy = df.copy()
-            df_copy.insert(0,column="",value=[x for x in seq1_labels])
-
-            self.table =Table(self.parent.master.table_container, dataframe=df_copy,
-                                    showtoolbar=True, showstatusbar=True)
-            self.table.show()
-
-        except Exception as e:
-                messagebox.showerror("Error", str(e))
-                return
-
-    def display_graph(self,df:DataFrame):
-        new_window = tkinter.Toplevel(self)
-        #zapisac do pliku
-        new_window.title("Graph")
-        new_window.geometry("700x600")
-        fig = generate_graph(self.df)
-        canvas = FigureCanvasTkAgg(fig, master=new_window)
-        canvas.draw()
-        canvas.get_tk_widget().pack(fill=BOTH, expand=1)
-        toolbar = NavigationToolbar2Tk(canvas, new_window)
-        toolbar.update()
-        toolbar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
-
-    def show_graph_window(self):
-        try:
-            self.display_graph(self.df)
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-
-class FastaInputPage(tkinter.Frame):
-    def __init__(self, parent, controller,convert_fun=convert_user_input_Protein):
-        super().__init__(parent, controller, convert_fun)
-
 class DNAInputPage(InputBaseFrame):
     def __init__(self, parent, controller, convert_fun=convert_user_input_DNA):
         super().__init__(parent, controller,convert_fun)
@@ -196,6 +181,51 @@ class RNAInputPage(InputBaseFrame):
 class ProteinInputPage(InputBaseFrame):
     def __init__(self, parent, controller,convert_fun=convert_user_input_Protein):
         super().__init__(parent, controller, convert_fun)
+
+def get_data(seq1_str, seq2_str, convert_fun,parent,frame):
+    input_seq1 = seq1_str
+    input_seq2 = seq2_str
+    seq1_labels="-"+input_seq1.upper()
+    try:
+        seq1 = convert_fun(input_seq1)
+        seq2 = convert_fun(input_seq2)
+        df = algorithm_implementation(seq1, seq2, gap=-1, mismatch=0, match=1)
+        frame.df = df.copy()
+        print(df)
+        print(traceback(df, gap=-1, mismatch=0, match=1))
+        print(int(get_score(df)))
+        #layout landy
+        #zapis do pliku tekstowego i zapis wykresu
+        #zrobic kopie do tableki
+        df_copy = df.copy()
+        df_copy.insert(0,column="",value=[x for x in seq1_labels])
+
+        table =Table(parent.master.table_container, dataframe=df_copy,
+                                showtoolbar=True, showstatusbar=True)
+        table.show()
+
+    except Exception as e:
+            messagebox.showerror("Error", str(e))
+            return
+
+def display_graph(df:DataFrame,root):
+    new_window = tkinter.Toplevel(root)
+    #zapisac do pliku
+    new_window.title("Graph")
+    new_window.geometry("700x600")
+    fig = generate_graph(df)
+    canvas = FigureCanvasTkAgg(fig, master=new_window)
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill=BOTH, expand=1)
+    toolbar = NavigationToolbar2Tk(canvas, new_window)
+    toolbar.update()
+    toolbar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
+
+def show_graph_window(df:DataFrame,root):
+    try:
+        display_graph(df,root)
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
 if __name__ == '__main__':
     app=App()
