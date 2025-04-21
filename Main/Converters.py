@@ -1,4 +1,5 @@
 from logging import exception
+from tkinter import messagebox
 
 from Exceptions.Exceptions import *
 from Sequences import *
@@ -12,19 +13,24 @@ def convert_user_input_Protein(user_sequence:str)->ProteinSequenceUser:
     if is_correct(user_sequence, {"A", "C", "D", "E","F","G","H","I","J","K","L","M","N","Q","R","S","T","V","W","Y","P"}):
         return ProteinSequenceUser(user_sequence)
     else:
-        exception(InvalidProteinSequence(user_sequence))
+        messagebox.showerror("DNA Sequence Error", f" {InvalidProteinSequence(user_sequence).message}")
+        return None
+
 
 def convert_user_input_RNA(user_sequence:str)->RNASequenceUser:
     if is_correct(user_sequence,{"A", "C", "G", "U"}):
         return RNASequenceUser(user_sequence)
     else:
-        exception(InvalidRNASequence(user_sequence))
+        messagebox.showerror("DNA Sequence Error", f" {InvalidRNASequence(user_sequence).message}")
+        return None
+
 
 def convert_user_input_DNA(user_sequence:str)->DNASequenceUser:
     if is_correct(user_sequence,{"A", "C", "G", "T"}):
         return DNASequenceUser(user_sequence)
     else:
-        exception(InvalidDNASequence(user_sequence))
+        messagebox.showerror("DNA Sequence Error", f" {InvalidDNASequence(user_sequence).message}")
+        return None
 
 # def convert_user_input_FASTA(user_sequence:str)->ProteinSequence:
 #     try:

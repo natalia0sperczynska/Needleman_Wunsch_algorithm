@@ -14,8 +14,7 @@ def generate_graph(df:DataFrame):
     ax.xaxis.tick_top()
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha='center')
     ax.set_title("Needleman-Wunsch score matrix", fontsize=12)
-    fig.show()
-    #return fig
+    return fig
 
 if __name__ == "__main__":
     generate_graph(df)
