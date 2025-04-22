@@ -10,7 +10,10 @@ df = algorithm_implementation(SequenceUser("AAACCCGTT"), SequenceUser("AATCGCGTA
 
 def generate_graph(df:DataFrame):
     fig, ax = plt.subplots(figsize=(6, 5))
-    sns.heatmap(df, annot=True,  linewidths=.5, ax=ax,cmap="crest")
+    is_cell_text = True
+    if df.size > 100:
+        is_cell_text = False
+    sns.heatmap(df, annot=is_cell_text, linewidths=.5, ax=ax, cmap="Blues", vmin=0)
     ax.xaxis.tick_top()
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha='center')
     ax.set_title("Needleman-Wunsch score matrix", fontsize=12)
