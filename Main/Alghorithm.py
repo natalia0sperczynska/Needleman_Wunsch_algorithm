@@ -47,7 +47,7 @@ def get_score(df:pd.DataFrame)->int:
 
 def percentage_for_all_matches(list:str):
     for alm in list:
-        print(match_percentage(*alm))
+        return match_percentage(*alm)
 
 def match_percentage(seq1:str,seq2:str):
     identical =  int(sum(np.array([ord(s) for s in seq1]) == np.array([ord(s) for s in seq2])))

@@ -220,7 +220,6 @@ def update_parameters(event,param:str,frame):
         messagebox.showerror("Invalid input", "Value needs to be an integer")
         return
 
-
 def open_file(file, seq:str,frame):
     path = filedialog.askopenfilename()
     file = open(path,'r')
@@ -255,10 +254,22 @@ def get_data(seq1_str, seq2_str, convert_fun,parent,frame):
                                 showtoolbar=True, showstatusbar=True)
         table.showIndex=False
         table.show()
+        #text result
+        l=tkinter.Label(frame,text='Results:')
+        l.grid(row=7,column=0, sticky="w",padx=5, pady=5, columnspan=4)
+
+        T =tkinter.Text(frame, bg='white', bd=1, pady=5, padx=5, height=5, width=30)
+        T.grid(row=8,column=0, columnspan=4,sticky="nsew",padx=10,pady=5)
+        T.insert(tkinter.END, print_results(df,accumulator=traceback(df, gap=frame.gap, mismatch=frame.mismatch, match=frame.match)))
 
     except Exception as e:
             messagebox.showerror("Error", str(e))
             return
+def print_results(df:DataFrame,accumulator)->str:
+    match_percentage, gap_percentage= percentage_for_all_matches(accumulator)
+    match_percentage*=100
+    gap_percentage*=100
+    return f"score: {get_score(df)} \nbest alignments: {accumulator} \nmatch percentage: {match_percentage} \ngap percentage: {gap_percentage}"
 def save_to_xlsx(df:DataFrame):
     root = Tk()
     try:
