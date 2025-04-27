@@ -8,6 +8,18 @@ sns.set_theme()
 df = algorithm_implementation(SequenceUser("AAACCCGTT"), SequenceUser("AATCGCGTAT"), gap=-1, mismatch=0, match=1)
 
 def generate_graph(df:DataFrame):
+    """Generate a heatmap visualization of the alignment score matrix.
+
+       Args:
+           df (DataFrame): Pandas DataFrame containing alignment scores
+
+       Returns:
+           matplotlib.figure.Figure: The generated figure object
+
+       Note:
+           Only shows cell annotations for matrices smaller than 100 elements
+           for readability. Uses a blue color palette.
+       """
     fig, ax = plt.subplots(figsize=(6, 5))
     is_cell_text = True
     if df.size > 100:

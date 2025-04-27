@@ -1,23 +1,52 @@
 class SequenceUser:
+    """Base class for biological sequence representation entered by the user.
+
+        Attributes:
+            _sequence (str): The stored sequence in uppercase
+        """
     def __init__(self,sequence : str):
+        """Initialize the sequence.
+
+                Args:
+                    sequence (str): The input biological sequence
+                """
         self._sequence : str = sequence.upper()
 
     def __str__(self):
+        """Get the stored sequence.
+
+               Returns:
+                   str: The stored sequence
+               """
         return f"{self._sequence}"
 
     def seq(self):
+        """Get the stored sequence.
+
+                       Returns:
+                           str: The stored sequence
+                       """
         return self._sequence
 
 class DNASequenceUser(SequenceUser):
+    """Class representing a validated DNA sequence."""
     pass
 
 class RNASequenceUser(SequenceUser):
+    """Class representing a validated RNA sequence."""
     pass
 
 class ProteinSequenceUser(SequenceUser):
+    """Class representing a validated protein sequence."""
     pass
 
 class ProteinSequence(SequenceUser):
+    """Class representing a protein sequence with FASTA identifier.
+
+        Attributes:
+            identifier (str): FASTA header/identifier line
+            data (str): The protein sequence data
+        """
     def __init__(self, identifier: str, data: str):
         self.identifier = identifier
         self.data = data
@@ -26,6 +55,14 @@ class ProteinSequence(SequenceUser):
         return f"{self.identifier}\n{self.data}"
 
 def fasta_to_pro_seq(fasta_file):
+    """Read a protein sequence from a FASTA file.
+
+       Args:
+           fasta_file (str): Path to the FASTA file
+
+       Returns:
+           ProteinSequence: Protein sequence object or None if reading fails
+       """
     try:
         with open(fasta_file, "r") as file:
             identifier = file.readline()
