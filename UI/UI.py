@@ -159,7 +159,7 @@ class InputBaseFrame(tkinter.Frame):
                                    3, 0)
         self._create_action_button("Show graph", lambda: show_graph_window(self.df, self.parent), 3, 1)
         self._create_action_button("Save as xlsx", lambda: save_to_xlsx(self.df), 3, 2)
-        self._create_action_button("Save as text file", lambda: save_as_text_file(self.df), 3, 3)
+        self._create_action_button("Save as text file", lambda: save_as_text_file(self.df,self), 3, 3)
         self._create_action_button("Back", lambda: self.controller.show_frame(HomePage), 4, 0, colspan=4)
     def _create_param_input(self, label_text, param_name, row, col):
         """Helper method to create a labeled parameter input field.
@@ -345,14 +345,33 @@ def save_to_xlsx(df:DataFrame):
 
     root.destroy()
 
-def save_as_text_file(df:DataFrame):
+def save_as_text_file(df:DataFrame,frame):
     """Save alignment results to text file."""
     file_path = filedialog.asksaveasfilename(defaultextension=".txt",
                                              filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
     if file_path:
         try:
             with open(file_path, 'w') as file:
-                file.write(df.to_string(index=False))
+                if frame:
+                    file.write(f"Alignment Parameters:\n")
+                    file.write(f"Match score: {frame.match}\n")
+                    file.write(f"Mismatch penalty: {frame.mismatch}\n")
+                    file.write(f"Gap penalty: {frame.gap}\n\n")
+
+                file.write("Score Matrix:\n")
+                file.write(df.to_string(index=True))
+                file.write("\n\n")
+
+                if hasattr(frame, 'df') and frame.df is not None:
+                    alignments = traceback(frame.df, gap=frame.gap, mismatch=frame.mismatch, match=frame.match)
+                    file.write(print_results(frame.df, alignments))
+                    file.write("\n\nOptimal Alignments:\n")
+                    for i, (seq1, seq2) in enumerate(alignments, 1):
+                        file.write(f"\nAlignment {i}:\n")
+                        file.write(f"Seq1: {seq1}\n")
+                        file.write(f"Seq2: {seq2}\n")
+                        match_pct, gap_pct = match_percentage(seq1, seq2)
+                        file.write(f"Match: {match_pct * 100:.1f}%, Gaps: {gap_pct * 100:.1f}%\n")
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
