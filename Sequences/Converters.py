@@ -1,8 +1,8 @@
-from logging import exception
-from tkinter import messagebox
 
+from tkinter import messagebox
 from Exceptions.Exceptions import *
-from Sequences import *
+from Sequences.Sequences import ProteinSequenceUser, RNASequenceUser, DNASequenceUser
+
 
 def is_correct(user_sequence : str, allowed_symbols : set) -> bool:
     user_sequence_upper = user_sequence.upper()
@@ -32,8 +32,3 @@ def convert_user_input_DNA(user_sequence:str)->DNASequenceUser:
         messagebox.showerror("DNA Sequence Error", f" {InvalidDNASequence(user_sequence).message}")
         return None
 
-# def convert_user_input_FASTA(user_sequence:str)->ProteinSequence:
-#     try:
-#         return fasta_to_pro_seq()
-#     except Exception as e:
-#         exception(e)

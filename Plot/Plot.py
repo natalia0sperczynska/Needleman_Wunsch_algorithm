@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pandas import DataFrame
-
-from Alghorithm import algorithm_implementation
-from Sequences import SequenceUser
+from Algorithm.Alghorithm import algorithm_implementation
+from Sequences.Sequences import SequenceUser
 
 sns.set_theme()
 df = algorithm_implementation(SequenceUser("AAACCCGTT"), SequenceUser("AATCGCGTAT"), gap=-1, mismatch=0, match=1)

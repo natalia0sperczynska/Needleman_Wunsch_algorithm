@@ -1,9 +1,8 @@
 import numpy as np
 import pandas as pd
 from pandas.core.interchange.dataframe_protocol import DataFrame
+from Sequences.Sequences import SequenceUser
 
-from Sequences import *
-#
 # seq1="GGAATTCCA"
 # seq2="GAAGTCCCA"
 
@@ -55,12 +54,13 @@ def match_percentage(seq1:str,seq2:str):
     return identical/len(seq1), gaps/len(seq1)
 
 if __name__ == '__main__':
-
+    pass
     # percentage_for_all_matches([('ACCT---', 'AAATTTG'), ('ACC-T--', 'AAATTTG'), ('AC-CT--', 'AAATTTG'), ('A-CCT--', 'AAATTTG'), ('-ACCT--', 'AAATTTG')])
-    alms = [('ACCT---', 'AAATTTG'), ('ACC-T--', 'AAATTTG'), ('AC-CT--', 'AAATTTG'), ('A-CCT--', 'AAATTTG'), ('-ACCT--', 'AAATTTG')]
-    al2s = [(seq1, seq2) for seq1, seq2 in alms]
-    print(match_percentage(*alms[0]))
+    # alms = [('ACCT---', 'AAATTTG'), ('ACC-T--', 'AAATTTG'), ('AC-CT--', 'AAATTTG'), ('A-CCT--', 'AAATTTG'), ('-ACCT--', 'AAATTTG')]
+    # al2s = [(seq1, seq2) for seq1, seq2 in alms]
+    # print(match_percentage(*alms[0]))
     # df = algorithm_implementation(seq1,seq2,gap=-1, mismatch=0,match=1)
     # print(df)
     # print(traceback(df, gap=-1, mismatch=0, match=1))
     # print(int(get_score(df)))
+

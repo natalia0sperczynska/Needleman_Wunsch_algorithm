@@ -1,8 +1,6 @@
 import unittest
 
-from Main.Sequences import *
-
-
+from Sequences.Sequences import *
 class MyTestCase(unittest.TestCase):
     """
     Unit tests for the Sequences.
