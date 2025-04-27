@@ -69,49 +69,58 @@ class HomePage(tkinter.Frame):
 class InputBaseFrame(tkinter.Frame):
     def __init__(self, parent, controller, converter_function):
         super().__init__(parent)
-        #self.setup_ui()
-        self.df : pd.DataFrame = None
         self.parent = parent
         self.controller = controller
         self.convert_fun = converter_function
-        self.file1=None
-        self.file2=None
-        self.seq1_str=""
-        self.seq2_str=""
+        self.df: pd.DataFrame = None
+        self.initialize_variables()
+        self.setup_ui()
+
+    def initialize_variables(self):
+        self.file1 = None
+        self.file2 = None
+        self.seq1_str = ""
+        self.seq2_str = ""
         self.match = 1
         self.mismatch = 0
         self.gap = -1
 
+    def setup_ui(self):
         self.configure(bg="#ad86e3")
-        for i in range(8):
-            self.grid_rowconfigure(i, weight=1)
-        for i in range(4):
-            self.grid_columnconfigure(i, weight=1)
+        self.setup_grid()
+        self.create_input_fields()
+        self.create_param_inputs()
+        self.create_action_buttons()
 
+    def setup_grid(self,row=8,column=4):
+        for i in range(row):
+            self.grid_rowconfigure(i, weight=1)
+        for i in range(column):
+            self.grid_columnconfigure(i, weight=1)
+    def create_input_fields(self):
         self.label1 = tkinter.Label(self, text="Enter first sequence")
         self.label1.grid(row=0, column=0, padx=5, pady=5, sticky="e")
         self.enter1 = tkinter.Entry(self, bg="#ad86e3")
         self.enter1.grid(row=0, column=1, padx=5, pady=5, sticky="w")
         self.enter1.bind('<FocusOut>', lambda event: update_entry(event, "seq1_str", self))
 
-        self.label2=tkinter.Label(self, text="Enter second sequence")
+        self.label2 = tkinter.Label(self, text="Enter second sequence")
         self.label2.grid(row=0, column=2, padx=5, pady=5, sticky="e")
         self.enter2 = tkinter.Entry(self, bg="#ad86e3")
         self.enter2.grid(row=0, column=3, padx=5, pady=5, sticky="w")
         self.enter2.bind('<FocusOut>', lambda event: update_entry(event, "seq2_str", self))
-
+    def create_param_inputs(self):
         self._create_param_input("Match", "match", 1, 0)
         self._create_param_input("Gap", "gap", 1, 2)
         self._create_param_input("Mismatch", "mismatch", 2, 0)
-
+    def create_action_buttons(self):
         self._create_action_button("Generate",
                                    lambda: get_data(self.seq1_str, self.seq2_str, self.convert_fun, self.parent, self),
                                    3, 0)
         self._create_action_button("Show graph", lambda: show_graph_window(self.df, self.parent), 3, 1)
         self._create_action_button("Save as xlsx", lambda: save_to_xlsx(self.df), 3, 2)
         self._create_action_button("Save as text file", lambda: save_as_text_file(self.df), 3, 3)
-        self._create_action_button("Back", lambda: controller.show_frame(HomePage), 4, 0, colspan=4)
-
+        self._create_action_button("Back", lambda: self.controller.show_frame(HomePage), 4, 0, colspan=4)
     def _create_param_input(self, label_text, param_name, row, col):
         label = tkinter.Label(self, text=label_text, bg="#ad86e3")
         label.grid(row=row, column=col, padx=5, pady=5, sticky="e")
@@ -125,64 +134,16 @@ class InputBaseFrame(tkinter.Frame):
         button = tkinter.Button(self, text=text, command=command, fg="black", bg="#5ba679")
         button.grid(row=row, column=col, columnspan=colspan, padx=10, pady=10)
 
-class FastaInputPage(tkinter.Frame):
-    def __init__(self, parent, controller, converter_function=convert_user_input_Protein):
-        super().__init__(parent)
-        self.df: pd.DataFrame = None
-        self.parent = parent
-        self.controller = controller
-        self.convert_fun = converter_function
-        self.file1 = None
-        self.file2 = None
-        self.seq1_str = ""
-        self.seq2_str = ""
-        self.match=1
-        self.mismatch=0
-        self.gap=-1
+class FastaInputPage(InputBaseFrame):
+    def __init__(self, parent, controller):
+        super().__init__(parent,controller,converter_function=convert_user_input_Protein)
+        self.modify_for_fasta()
 
-        self.configure(bg="#ad86e3")
-
-        for i in range(8):
-            self.grid_rowconfigure(i, weight=1)
-        for i in range(4):
-            self.grid_columnconfigure(i, weight=1)
-
-        self.label1 = tkinter.Label(self, text="Enter first sequence")
-        self.label1.grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        self.enter1 = tkinter.Entry(self, bg="#ad86e3")
-
-        self._create_action_button("Add file",lambda:open_file(self.file1,"seq1_str",self),0,1)
-
-
-        self.label2 = tkinter.Label(self, text="Enter second sequence")
-        self.label2.grid(row=0, column=2,padx=5,pady=5,sticky='e')
-
-        self._create_action_button("Add file", lambda: open_file(self.file2, "seq2_str", self), 0, 3)
-
-        self._create_param_input("Match", "match", 1, 0)
-        self._create_param_input("Gap", "gap", 1, 2)
-        self._create_param_input("Mismatch", "mismatch", 2, 0)
-
-        self._create_action_button("Generate",
-                                   lambda: get_data(self.seq1_str, self.seq2_str, self.convert_fun, self.parent, self),
-                                   3, 0)
-        self._create_action_button("Show graph", lambda: show_graph_window(self.df, self.parent), 3, 1)
-        self._create_action_button("Save as xlsx", lambda: save_to_xlsx(self.df), 3, 2)
-        self._create_action_button("Save as text file", lambda: save_as_text_file(self.df), 3, 3)
-        self._create_action_button("Back", lambda: controller.show_frame(HomePage), 4, 0, colspan=4)
-
-    def _create_param_input(self, label_text, param_name, row, col):
-        label = tkinter.Label(self, text=label_text, bg="#ad86e3")
-        label.grid(row=row, column=col, padx=5, pady=5, sticky="e")
-        entry = tkinter.Entry(self)
-        entry.insert(0, str(getattr(self, param_name)))
-        entry.grid(row=row, column=col + 1, padx=5, pady=5, sticky="w")
-        entry.bind('<FocusOut>', lambda event: update_parameters(event, param_name, self))
-        setattr(self, f"enter{param_name.capitalize()}", entry)
-
-    def _create_action_button(self, text, command, row, col, colspan=1):
-        button = tkinter.Button(self, text=text, command=command, fg="black", bg="#5ba679")
-        button.grid(row=row, column=col, columnspan=colspan, padx=10, pady=10)
+    def modify_for_fasta(self):
+        self.enter1.grid_remove()
+        self.enter2.grid_remove()
+        self._create_action_button("Add file 1", lambda: open_file(self.file1, "seq1_str", self), 0, 1)
+        self._create_action_button("Add file 2", lambda: open_file(self.file2, "seq2_str", self), 0, 3)
 
 class DNAInputPage(InputBaseFrame):
     def __init__(self, parent, controller, converter_function=convert_user_input_DNA):
